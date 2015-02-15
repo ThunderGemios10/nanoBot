@@ -23,18 +23,18 @@
     var kill = function () {
         clearInterval(nanoBot.room.autodisableInterval);
         clearInterval(nanoBot.room.afkInterval);
-        basicBot.status = false;
+        nanoBot.status = false;
     };
 
     var storeToStorage = function () {
-        localStorage.setItem("nanoBotsettings", JSON.stringify(basicBot.settings));
-        localStorage.setItem("nanoBotRoom", JSON.stringify(basicBot.room));
-        var basicBotStorageInfo = {
+        localStorage.setItem("nanoBotsettings", JSON.stringify(nanoBot.settings));
+        localStorage.setItem("nanoBotRoom", JSON.stringify(nanoBot.room));
+        var nanoBotStorageInfo = {
             time: Date.now(),
             stored: true,
             version: nanoBot.version
         };
-        localStorage.setItem("nanoBotStorageInfo", JSON.stringify(basicBotStorageInfo));
+        localStorage.setItem("nanoBotStorageInfo", JSON.stringify(nanoBotStorageInfo));
 
     };
 
@@ -54,11 +54,11 @@
     var loadChat = function (cb) {
         if (!cb) cb = function () {
         };
-        $.get("https://rawgit.com/Yemasthui/basicBot/master/lang/langIndex.json", function (json) {
-            var link = basicBot.chatLink;
+        $.get("https://rawgit.com/ThunderGemios10/nanoBot/master/lang/langIndex.json", function (json) {
+            var link = nanoBot.chatLink;
             if (json !== null && typeof json !== "undefined") {
                 langIndex = json;
-                link = langIndex[basicBot.settings.language.toLowerCase()];
+                link = langIndex[nanoBot.settings.language.toLowerCase()];
                 if (nanoBot.settings.chatLink !== nanoBot.chatLink) {
                     link = nanoBot.settings.chatLink;
                 }
@@ -91,7 +91,7 @@
         var settings = JSON.parse(localStorage.getItem("nanoBotsettings"));
         if (settings !== null) {
             for (var prop in settings) {
-                basicBot.settings[prop] = settings[prop];
+                nanoBot.settings[prop] = settings[prop];
             }
         }
     };
@@ -106,7 +106,7 @@
             if ((elapsed < 1 * 60 * 60 * 1000)) {
                 API.chatLog(nanoBot.chat.retrievingdata);
                 for (var prop in settings) {
-                    basicBot.settings[prop] = settings[prop];
+                    nanoBot.settings[prop] = settings[prop];
                 }
                 nanoBot.room.users = room.users;
                 nanoBot.room.afkList = room.afkList;
@@ -135,7 +135,7 @@
                 if (json !== null && typeof json !== "undefined") {
                     json_sett = JSON.parse(json);
                     for (var prop in json_sett) {
-                        basicBot.settings[prop] = json_sett[prop];
+                        nanoBot.settings[prop] = json_sett[prop];
                     }
                 }
             });
@@ -183,7 +183,7 @@
         status: false,
         name: "nanoBot",
         loggedInID: null,
-        scriptLink: "https://rawgit.com/ThunderGemios10/nanoBot/master/basicBot.js",
+        scriptLink: "https://rawgit.com/ThunderGemios10/nanoBot/master/nanoBot.js",
         cmdLink: "http://git.io/245Ppg",
         chatLink: "https://rawgit.com/ThunderGemios10/nanoBot/master/lang/en.json",
         chat: null,
@@ -299,23 +299,23 @@
                 participants: [],
                 countdown: null,
                 startRoulette: function () {
-                    basicBot.room.roulette.rouletteStatus = true;
-                    basicBot.room.roulette.countdown = setTimeout(function () {
-                        basicBot.room.roulette.endRoulette();
+                    nanoBot.room.roulette.rouletteStatus = true;
+                    nanoBot.room.roulette.countdown = setTimeout(function () {
+                        nanoBot.room.roulette.endRoulette();
                     }, 60 * 1000);
-                    API.sendChat(basicBot.chat.isopen);
+                    API.sendChat(nanoBot.chat.isopen);
                 },
                 endRoulette: function () {
-                    basicBot.room.roulette.rouletteStatus = false;
-                    var ind = Math.floor(Math.random() * basicBot.room.roulette.participants.length);
-                    var winner = basicBot.room.roulette.participants[ind];
-                    basicBot.room.roulette.participants = [];
+                    nanoBot.room.roulette.rouletteStatus = false;
+                    var ind = Math.floor(Math.random() * nanoBot.room.roulette.participants.length);
+                    var winner = nanoBot.room.roulette.participants[ind];
+                    nanoBot.room.roulette.participants = [];
                     var pos = Math.floor((Math.random() * API.getWaitList().length) + 1);
-                    var user = basicBot.userUtilities.lookupUser(winner);
+                    var user = nanoBot.userUtilities.lookupUser(winner);
                     var name = user.username;
-                    API.sendChat(subChat(basicBot.chat.winnerpicked, {name: name, position: pos}));
+                    API.sendChat(subChat(nanoBot.chat.winnerpicked, {name: name, position: pos}));
                     setTimeout(function (winner, pos) {
-                        basicBot.userUtilities.moveUser(winner, pos, false);
+                        nanoBot.userUtilities.moveUser(winner, pos, false);
                     }, 1 * 1000, winner, pos);
                 }
             }
@@ -374,7 +374,7 @@
             lookupUser: function (id) {
                 for (var i = 0; i < nanoBot.room.users.length; i++) {
                     if (nanoBot.room.users[i].id === id) {
-                        return basicBot.room.users[i];
+                        return nanoBot.room.users[i];
                     }
                 }
                 return false;
@@ -713,8 +713,8 @@
             },
             exportNewBlacklistedSongs: function () {
                 var list = {};
-                for (var i = 0; i < basicBot.room.newBlacklisted.length; i++) {
-                    var track = basicBot.room.newBlacklisted[i];
+                for (var i = 0; i < nanoBot.room.newBlacklisted.length; i++) {
+                    var track = nanoBot.room.newBlacklisted[i];
                     list[track.list] = [];
                     list[track.list].push({
                         title: track.title,
@@ -728,23 +728,23 @@
         eventChat: function (chat) {
             chat.message = linkFixer(chat.message);
             chat.message = chat.message.trim();
-            for (var i = 0; i < basicBot.room.users.length; i++) {
-                if (basicBot.room.users[i].id === chat.uid) {
-                    basicBot.userUtilities.setLastActivity(basicBot.room.users[i]);
-                    if (basicBot.room.users[i].username !== chat.un) {
-                        basicBot.room.users[i].username = chat.un;
+            for (var i = 0; i < nanoBot.room.users.length; i++) {
+                if (nanoBot.room.users[i].id === chat.uid) {
+                    nanoBot.userUtilities.setLastActivity(nanoBot.room.users[i]);
+                    if (nanoBot.room.users[i].username !== chat.un) {
+                        nanoBot.room.users[i].username = chat.un;
                     }
                 }
             }
-            if (basicBot.chatUtilities.chatFilter(chat)) return void (0);
-            if (!basicBot.chatUtilities.commandCheck(chat))
-                basicBot.chatUtilities.action(chat);
+            if (nanoBot.chatUtilities.chatFilter(chat)) return void (0);
+            if (!nanoBot.chatUtilities.commandCheck(chat))
+                nanoBot.chatUtilities.action(chat);
         },
         eventUserjoin: function (user) {
             var known = false;
             var index = null;
-            for (var i = 0; i < basicBot.room.users.length; i++) {
-                if (basicBot.room.users[i].id === user.id) {
+            for (var i = 0; i < nanoBot.room.users.length; i++) {
+                if (nanoBot.room.users[i].id === user.id) {
                     known = true;
                     index = i;
                 }
@@ -752,40 +752,40 @@
             var greet = true;
             var welcomeback = null;
             if (known) {
-                basicBot.room.users[index].inRoom = true;
-                var u = basicBot.userUtilities.lookupUser(user.id);
+                nanoBot.room.users[index].inRoom = true;
+                var u = nanoBot.userUtilities.lookupUser(user.id);
                 var jt = u.jointime;
                 var t = Date.now() - jt;
                 if (t < 10 * 1000) greet = false;
                 else welcomeback = true;
             }
             else {
-                basicBot.room.users.push(new basicBot.User(user.id, user.username));
+                nanoBot.room.users.push(new nanoBot.User(user.id, user.username));
                 welcomeback = false;
             }
-            for (var j = 0; j < basicBot.room.users.length; j++) {
-                if (basicBot.userUtilities.getUser(basicBot.room.users[j]).id === user.id) {
-                    basicBot.userUtilities.setLastActivity(basicBot.room.users[j]);
-                    basicBot.room.users[j].jointime = Date.now();
+            for (var j = 0; j < nanoBot.room.users.length; j++) {
+                if (nanoBot.userUtilities.getUser(nanoBot.room.users[j]).id === user.id) {
+                    nanoBot.userUtilities.setLastActivity(nanoBot.room.users[j]);
+                    nanoBot.room.users[j].jointime = Date.now();
                 }
 
             }
-            if (basicBot.settings.welcome && greet) {
+            if (nanoBot.settings.welcome && greet) {
                 welcomeback ?
                     setTimeout(function (user) {
-                        API.sendChat(subChat(basicBot.chat.welcomeback, {name: user.username}));
+                        API.sendChat(subChat(nanoBot.chat.welcomeback, {name: user.username}));
                     }, 1 * 1000, user)
                     :
                     setTimeout(function (user) {
-                        API.sendChat(subChat(basicBot.chat.welcome, {name: user.username}));
+                        API.sendChat(subChat(nanoBot.chat.welcome, {name: user.username}));
                     }, 1 * 1000, user);
             }
         },
         eventUserleave: function (user) {
-            for (var i = 0; i < basicBot.room.users.length; i++) {
-                if (basicBot.room.users[i].id === user.id) {
-                    basicBot.userUtilities.updateDC(basicBot.room.users[i]);
-                    basicBot.room.users[i].inRoom = false;
+            for (var i = 0; i < nanoBot.room.users.length; i++) {
+                if (nanoBot.room.users[i].id === user.id) {
+                    nanoBot.userUtilities.updateDC(nanoBot.room.users[i]);
+                    nanoBot.room.users[i].inRoom = false;
                 }
             }
         },
