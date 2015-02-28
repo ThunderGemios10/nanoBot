@@ -23,7 +23,7 @@
     var kill = function () {
         clearInterval(nanoBot.room.autodisableInterval);
         clearInterval(nanoBot.room.afkInterval);
-        nanoBot.status = false;
+        nanoBot.status = true;
     };
 
     var storeToStorage = function () {
